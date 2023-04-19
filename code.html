@@ -335,10 +335,29 @@ function displayStats(currentEvents) {
             function is ran to correctly load the page according to the new
             inputs.
           </p>
-          <h5>getEventData</h5>
-          <p></p>
-          <h5>getEventData</h5>
-          <p></p>
+          <h5>viewFilteredEvents</h5>
+          <p>
+            viewFilteredEvents gives functionality to the drop down menu that
+            let's you filter your selections by city. After acquiring the
+            information from the drop down menu and getEventData, the function
+            begins by making an if statement to make sure the function displays
+            all information if "All" is selected. When the if statement returns
+            the "All" value, the function ends. If "All" is not selected, then
+            the funciton will go on to filter events by comparing the selection
+            in the drop down to the cities brought over from getEventData. The
+            filtered events are then given to displayStats so that they can be
+            viewed. There is also a line to change the heading of the stats bar
+            to match the selected city name and another line to give the
+            filtered events to displayEventData.
+          </p>
+          <h5>buildDropDown</h5>
+          <p>
+            buildDropDown is the meat of what gives this app funcitonality. The
+            first line is just there to clear out the stats in the stats box.
+            After that, it collects the data from getEventData and turns it into
+            'currentEvents'. TODO--------------------MAKE SURE TO UPDATE THIS
+            SECTION---------------------TODO
+          </p>
           <h5>getEventData</h5>
           <p></p>
           <h5>getEventData</h5>
