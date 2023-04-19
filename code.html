@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
 
     <link
@@ -41,99 +41,333 @@
       href="/img/favicon-32x32.png"
       type="image/x-icon"
     />
-</head>
-<body>
-<header>
-     <nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
-      <div class="container">
-        <a class="navbar-brand" href="#">
-          <img src="/img/Gates Aqua Mark (2560 × 2560 px).png" height="60" />
-        </a>
+  </head>
+  <body>
+    <header>
+      <nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
+        <div class="container">
+          <a class="navbar-brand" href="#">
+            <img src="/img/Gates Aqua Mark (2560 × 2560 px).png" height="60" />
+          </a>
 
-        <!-- TODO: customize mobile menu button -->
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-bg">
-            <i class="bi bi-list"></i>
-          </span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav navbar-nav-bg ms-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#home"
-                >Home</a
-              >
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/app.html">The App</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/code.html">The Code</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">The Repo</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">About</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="blog.html">Blog</a>
-            </li>
-          </ul>
+          <!-- TODO: customize mobile menu button -->
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-bg">
+              <i class="bi bi-list"></i>
+            </span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav navbar-nav-bg ms-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#home"
+                  >Home</a
+                >
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/app.html">The App</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/code.html">The Code</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">The Repo</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">About</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="blog.html">Blog</a>
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
-    </nav>
-</header>
-<main class="container">
-<h1 class="border-bottom border-2 border-dark mt-3">The Code</h1>
-<div class="row">
-    <div class="col-12 col-lg-8">
-        <pre class="line-numbers">
+      </nav>
+    </header>
+    <main class="container">
+      <h1 class="border-bottom border-2 border-dark mt-3">The Code</h1>
+      <div class="row">
+        <div class="col-12 col-lg-8">
+          <pre class="line-numbers">
             <code class="language-js">
-                function displayMessage() {
-    let msg = document.getElementById("message").value;
-    alert(msg);
-  
+function getEventData() {
+  let data = localStorage.getItem("bgPackTrackerEventData");
+
+  if (data == null) {
+    localStorage.setItem("bgPackTrackerEventData", JSON.stringify(events));
+  }
+
+  let currentEvents = data == null ? events : JSON.parse(data);
+
+  return currentEvents;
+}
+
+function saveNewEvent() {
+  // get the form input values
+  let name = document.getElementById('newEventName').value;
+  let city = document.getElementById("newEventCity").value;
+
+  let attendance = parseInt(
+    document.getElementById("newEventAttendance").value
+  );
+
+  let dateValue = document.getElementById('newEventDate').value;
+  dateValue = new Date(dateValue);
+
+  let date = dateValue.toLocaleDateString();
+
+  let stateSelect = document.getElementById('newEventState');
+  let stateIndex = stateSelect.selectedIndex;
+  let state = stateSelect.options[stateIndex].index;
+  //create a new event object
+let newEvent = {
+  event: name,
+  city: city,
+  state: state,
+  attendance: attendance,
+  date: date,
+};
+  //add it to the array of current events
+  let events = getEventData();
+  events.push(newEvent);
+
+  //then, save the array with the new event
+  localStorage.setItem('bgPackTrackerEventData', JSON.stringify(events));
+
+  buildDropDown();
+}
+
+function viewFilteredEvents(dropdownItem) {
+  let cityName = dropdownItem.getAttribute("data-string");
+
+  //get all my events
+  let allEvents = getEventData();
+
+  if (cityName == "All") {
+    displayStats(allEvents);
+    displayEventData(allEvents);
+    document.getElementById("location").innerText = "All Events";
+
+    return;
+  }
+
+  // filter those events to just the selected city
+  let filteredEvents = allEvents.filter(
+    (event) => event.city.toLowerCase() == cityName.toLowerCase()
+  );
+
+  // let filteredEvents2 = allEvents.filter(function(event){
+  //   return event.city.toLowerCase() == cityName.toLowerCase();
+  // });
+
+  //display the stats for those events
+  displayStats(filteredEvents);
+
+  //change the stats header
+  document.getElementById("location").textContent = cityName;
+
+  // display only those events in the table
+  displayEventData(filteredEvents);
+}
+
+function buildDropDown() {
+  // build dropdown for specific cities
+  let dropdownMenu = document.getElementById("eventDropDown");
+  dropdownMenu.innerHTML = "";
+
+  let currentEvents = getEventData(); // TODO - get these from storage
+
+  let cityNames = currentEvents.map((event) => event.city);
+  let citiesSet = new Set(cityNames);
+  let distinctCities = [...citiesSet];
+
+  const dropdownTemplate = document.getElementById("dropdownItemTemplate");
+
+  //copy the template
+  let dropdownItemNode = document.importNode(dropdownTemplate.content, true);
+
+  // make our changes
+  let dropdownItemLink = dropdownItemNode.querySelector("a");
+  dropdownItemLink.innerText = "All Cities";
+  dropdownItemLink.setAttribute("data-string", "All");
+
+  //add our copy to the page
+  dropdownMenu.appendChild(dropdownItemNode);
+
+  for (let i = 0; i < distinctCities.length; i += 1) {
+    //get the city name
+    let cityName = distinctCities[i];
+
+    //generate a dropdown element
+
+    let itemNode = document.importNode(dropdownTemplate.content, true);
+    let anchorTag = itemNode.querySelector("a");
+    anchorTag.innerText = cityName;
+    anchorTag.setAttribute("data-string", cityName);
+
+    //append it to the dropdown menu
+    dropdownMenu.appendChild(itemNode);
+  }
+
+  displayEventData(currentEvents);
+  displayStats(currentEvents);
+  document.getElementById("location").innerText = "All Events";
+
+  //   function (event) {
+  //     return event.city
+  //   }
+  // )
+
+  // for (let i = 0; i < currentEvents.length; i++) {
+  //   cityNames.push(events[i].city)
+  // }
+}
+
+function displayEventData(currentEvents) {
+  const eventTable = document.getElementById("eventTable");
+  const template = document.getElementById("tableRowTemplate");
+
+  eventTable.innerHTML = "";
+
+  for (let i = 0; i < currentEvents.length; i++) {
+    let event = currentEvents[i];
+
+    let tableRow = document.importNode(template.content, true);
+
+    tableRow.querySelector('[data-id="event"]').textContent = event.event;
+    tableRow.querySelector('[data-id="city"]').textContent = event.city;
+    tableRow.querySelector('[data-id="state"]').textContent = event.state;
+    tableRow.querySelector('[data-id="attendance"]').textContent =
+      event.attendance.toLocaleString();
+    tableRow.querySelector('[data-id="date"]').textContent = new Date(event.date).toLocaleDateString();
+
+    eventTable.appendChild(tableRow);
+  }
+}
+
+function calculateStats(currentEvents) {
+  let total = 0;
+  let average = 0;
+  let most = 0;
+  let least = currentEvents[0].attendance;
+
+  for (let i = 0; i < currentEvents.length; i++) {
+    let currentAttendance = currentEvents[i].attendance;
+
+    total += currentAttendance;
+
+    if (currentAttendance > most) {
+      most = currentAttendance;
+    }
+
+    if (currentAttendance < least) {
+      least = currentAttendance;
+    }
+  }
+
+  average = total / currentEvents.length;
+
+  let stats = {
+    total: total,
+    average: average,
+    most: most,
+    least: least,
+  };
+
+  return stats;
+}
+
+function displayStats(currentEvents) {
+  let statistics = calculateStats(currentEvents);
+
+  //get the elements where the stats go
+  // set their text to be the correct stat from statistics
+  document.getElementById("total").textContent =
+    statistics.total.toLocaleString();
+
+  document.getElementById("average").textContent = Math.round(
+    statistics.average
+  ).toLocaleString();
+
+  document.getElementById("most").textContent =
+    statistics.most.toLocaleString();
+  document.getElementById("least").textContent =
+    statistics.least.toLocaleString();
 }
             </code>
         </pre>
-    </div>
-    <div class="col-12 col-lg-4">
-        <p>The code is structured in one function</p>
-        <h5>displayMessage</h5>
-        <p>Prints out the message</p>
-    </div>
-</div>
-</main>
-<footer>
-      
-        <div class="container">
-            <div
-              class="row mb-3 mt-2 row-cols-1 row-cols-md-3 align-items-center gy-3 text-center"
-            >
-              <div class="col">
-                <img src="/img/Water Gates Banner.png" height="90" class="pt-1" />
-              </div>
-              <div class="col text-md-end">
-                <a href="mylinked in">
-                  <i class="bi bi-linkedin p-2 socialicons"></i></a
-                >&nbsp;<a href="https://github.com/bryantgates"
-                  ><i class="bi bi-github p-2 socialicons"></i
-                ></a>
-              </div>
-              <div class="col text-dark order-md-first text-md-start mt-2">
-                &copy; 2023 Bryant Gates
-              </div>
-            </div>
         </div>
-      
+        <div class="col-12 col-lg-4">
+          <p>The code is structured in seven functions</p>
+          <h5>getEventData</h5>
+          <p>
+            The primary purpose of this funciton is to obtain all of the data
+            for the events. It begins by accessing the local storage of the
+            user's browser and turning it into 'data'. If there is nothing in
+            internal storage, then the 'events' object is assigned to it.
+            'events' is a preset series of events that are embedded in the
+            JavaScript. After it is either recovered from local storage, or
+            assigned 'events', the data is returned as 'currentEvents' to be
+            used in other functions.
+          </p>
+          <h5>saveNewEvent</h5>
+          <p>
+            The saveNewEvent function is used to acquire any user added events
+            and add them to the local storage of their browser. It begins by
+            collecting data from the forms they filled in on the app's page.
+            Several of the values need extra attention. attendance is converted
+            into an interger because there are no partial people and it should
+            be a number, not a string. The date in converted into a date that
+            JavaScript recognizes. Then, it is set to assign itself according to
+            how the local device would show a date. When the state is brough in,
+            it is selected from an array of states and it is specified by it's
+            index as the user selected it. After everything is collected, it is
+            grouped into the 'newEvent' object. This is then pushed into the
+            data the getEventValue function collected. Finally the new set of
+            events is assigned to the local storage and the buildDropDown
+            function is ran to correctly load the page according to the new
+            inputs.
+          </p>
+          <h5>getEventData</h5>
+          <p></p>
+          <h5>getEventData</h5>
+          <p></p>
+          <h5>getEventData</h5>
+          <p></p>
+          <h5>getEventData</h5>
+          <p></p>
+          <h5>getEventData</h5>
+          <p></p>
+        </div>
+      </div>
+    </main>
+    <footer>
+      <div class="container">
+        <div
+          class="row mb-3 mt-2 row-cols-1 row-cols-md-3 align-items-center gy-3 text-center"
+        >
+          <div class="col">
+            <img src="/img/Water Gates Banner.png" height="90" class="pt-1" />
+          </div>
+          <div class="col text-md-end">
+            <a href="mylinked in">
+              <i class="bi bi-linkedin p-2 socialicons"></i></a
+            >&nbsp;<a href="https://github.com/bryantgates"
+              ><i class="bi bi-github p-2 socialicons"></i
+            ></a>
+          </div>
+          <div class="col text-dark order-md-first text-md-start mt-2">
+            &copy; 2023 Bryant Gates
+          </div>
+        </div>
+      </div>
     </footer>
     <!--Bootstrap CSS-->
     <script
@@ -144,12 +378,12 @@
 
     <script src="/js/prism.js"></script>
     <script>
-        Prism.plugins.NormalizeWhitespace.setDefaults({
-            'remove-trailing': true,
-            'remove-indent': true,
-            'left-trim': true,
-            'right-trim': true
-        })
+      Prism.plugins.NormalizeWhitespace.setDefaults({
+        "remove-trailing": true,
+        "remove-indent": true,
+        "left-trim": true,
+        "right-trim": true,
+      });
     </script>
-</body>
+  </body>
 </html>
